@@ -38,6 +38,14 @@ Com as dependências instaladas e a estrutura de pastas configurada, execute o s
 ```bash
 python principal.py
 ```
+NÃO ESQUEÇA DE INFORMAR SUA LATITUDE, LONGITUDE E ALTITUDE:
+
+```bash
+latitude_usuario = -7.2300 * u.deg
+longitude_usuario = -35.8811 * u.deg
+altitude_usuario = 550 * u.m
+```
+
 
 O programa irá gerar no terminal:
 
