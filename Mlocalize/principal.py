@@ -1,83 +1,101 @@
 # principal.py
 
+import tkinter as tk
+from tkinter import ttk, messagebox
 from astropy.coordinates import EarthLocation, AltAz, SkyCoord
 from astropy.time import Time
 import astropy.units as u
 from dados.catalogo import catalogo_messier
 
-# 1. Definir a sua localização!
+class MlocalizeApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Mlocalize - Objetos Messier Visíveis")
+        self.root.geometry("750x600")
+        self.root.configure(bg="#121212") # Fundo escuro para astronomia
 
-latitude_usuario = -7.2300 * u.deg
-longitude_usuario = -35.8811 * u.deg
-altitude_usuario = 550 * u.m
+        # Título
+        titulo = tk.Label(root, text="🔭 Mlocalize - Céu de Campina Grande, PB", 
+                          font=("Arial", 14, "bold"), fg="#ffffff", bg="#121212")
+        titulo.pack(pady=15)
 
-localizacao_usuario = EarthLocation(
-    lat=latitude_usuario, 
-    lon=longitude_usuario, 
-    height=altitude_usuario
-)
+        # Botão de cálculo
+        btn_calcular = tk.Button(root, text="Calcular Objetos Visíveis Agora", 
+                                 command=self.atualizar_dados,
+                                 font=("Arial", 11, "bold"), bg="#1f6feb", fg="white", padx=10, relief="flat")
+        btn_calcular.pack(pady=5)
 
-# 2. Obter o momento temporal atual
-tempo_atual = Time.now()
+        # Caixa de texto com barra de rolagem (estilo terminal limpo)
+        frame_texto = tk.Frame(root, bg="#121212")
+        frame_texto.pack(fill="both", expand=True, padx=20, pady=15)
 
+        self.txt_resultados = tk.Text(frame_texto, bg="#1e1e1e", fg="#00ffcc", 
+                                      font=("Consolas", 10), relief="flat")
+        scrollbar = tk.Scrollbar(frame_texto, command=self.txt_resultados.yview)
+        
+        self.txt_resultados.configure(yscrollcommand=scrollbar.set)
+        
+        self.txt_resultados.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
 
-# 3. Configurar a transformação para o sistema de horizonte local (AltAz)
-frame_local = AltAz(obstime=tempo_atual, location=localizacao_usuario)
+        # Executa o cálculo inicial ao abrir
+        self.atualizar_dados()
 
-lista_visiveis = []
+    def calcular_visibilidade(self):
+        # Localização (Campina Grande, PB)
+        localizacao = EarthLocation(lat=-7.2300 * u.deg, lon=-35.8811 * u.deg, height=550 * u.m)
+        tempo = Time.now()
+        frame = AltAz(obstime=tempo, location=localizacao)
+        
+        visiveis = []
+        for nome, coords in catalogo_messier.items():
+            sky = SkyCoord(ra=coords['ar'], dec=coords['dec'], unit=(u.deg, u.deg), frame='icrs')
+            local = sky.transform_to(frame)
+            if local.alt.deg > 15.0:
+                visiveis.append({
+                    "nome": nome,
+                    "altitude": local.alt.deg,
+                    "azimute": local.az.deg
+                })
+        
+        visiveis.sort(key=lambda x: x["altitude"], reverse=True)
+        return tempo, visiveis
 
-# 4. Iterar pelos objetos, converter coordenadas e filtrar os visíveis (> 15°)
-for nome_objeto, coordenadas in catalogo_messier.items():
-    coordenada_ceu = SkyCoord(
-        ra=coordenadas['ar'], 
-        dec=coordenadas['dec'], 
-        unit=(u.deg, u.deg), 
-        frame='icrs'
-    )
-    
-    coordenada_local = coordenada_ceu.transform_to(frame_local)
-    
-    altitude_graus = coordenada_local.alt.deg
-    azimute_graus = coordenada_local.az.deg
-    
-    if altitude_graus > 15.0:
-        lista_visiveis.append({
-            "nome": nome_objeto,
-            "altitude": altitude_graus,
-            "azimute": azimute_graus
-        })
+    def atualizar_dados(self):
+        self.txt_resultados.delete("1.0", tk.END)
+        tempo, visiveis = self.calcular_visibilidade()
+        
+        largura_coluna_nome = 45
+        linha_separadora = "-" * (largura_coluna_nome + 26)
 
-# 5. Ordenar os objetos do mais próximo do zênite para o mais distante
-lista_visiveis.sort(key=lambda x: x["altitude"], reverse=True)
+        # Iniciando direto com a tabela sem exibir horário ou local na tela
+        texto_saida = f"{'Objeto':<{largura_coluna_nome}} | {'Altitude':<10} | {'Azimute':<10}\n"
+        texto_saida += linha_separadora + "\n"
+        
+        for obj in visiveis:
+            texto_saida += f"{obj['nome']:<{largura_coluna_nome}} | {obj['altitude']:>6.2f}°    | {obj['azimute']:>6.2f}°\n"
+        
+        texto_saida += linha_separadora + "\n"
+        texto_saida += f"Total de objetos visíveis no momento: {len(visiveis)}\n\n"
+        
+        melhores = [o for o in visiveis if o["altitude"] >= 60.0]
+        texto_saida += "=" * len(linha_separadora) + "\n"
+        texto_saida += "⭐ RECOMENDAÇÃO DA NOITE (Mais próximos do Zênite / Alto Céu):\n"
+        texto_saida += "=" * len(linha_separadora) + "\n"
+        
+        if melhores:
+            for i, obj in enumerate(melhores[:3], 1):
+                texto_saida += f"{i}. {obj['nome']} — Altitude de {obj['altitude']:.2f}° (Excelente visibilidade!)\n"
+        else:
+            if visiveis:
+                texto_saida += f"Nenhum objeto está muito perto do zênite agora, mas o topo da lista ({visiveis[0]['nome']}) é a melhor opção no momento.\n"
+            else:
+                texto_saida += "Nenhum objeto Messier do catálogo interno está acima de 15° no momento.\n"
+        texto_saida += "=" * len(linha_separadora) + "\n"
 
-# 6. Exibir a tabela completa 
-largura_coluna_nome = 45
-linha_separadora = "-" * (largura_coluna_nome + 26)
+        self.txt_resultados.insert(tk.END, texto_saida)
 
-print();
-print("MLOCALIZE - Objetos Messier Visíveis-----------------------------------\n")
-print(f"{'Objeto':<{largura_coluna_nome}} | {'Altitude':<10} | {'Azimute':<10}")
-print(linha_separadora)
-
-for obj in lista_visiveis:
-    print(f"{obj['nome']:<{largura_coluna_nome}} | {obj['altitude']:>6.2f}°    | {obj['azimute']:>6.2f}°")
-
-print(linha_separadora)
-print(f"Total de objetos visíveis no momento: {len(lista_visiveis)}")
-
-# 7. Recomendação dos melhores alvos (mais próximos do zênite)
-melhores_alvos = [obj for obj in lista_visiveis if obj["altitude"] >= 60.0]
-
-print("\n" + "=" * len(linha_separadora))
-print("RECOMENDAÇÃO DA NOITE (Mais próximos do Zênite / Alto Céu):")
-print("=" * len(linha_separadora))
-
-if melhores_alvos:
-    for i, obj in enumerate(melhores_alvos[:3], 1):
-        print(f"{i}. {obj['nome']} — Altitude de {obj['altitude']:.2f}° (Excelente visibilidade!)")
-else:
-    if lista_visiveis:
-        print(f"Nenhum objeto está muito perto do zênite agora, mas o topo da lista ({lista_visiveis[0]['nome']}) é a melhor opção no momento.")
-    else:
-        print("Nenhum objeto Messier do catálogo interno está acima de 15° no momento.")
-print("=" * len(linha_separadora))
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = MlocalizeApp(root)
+    root.mainloop()
