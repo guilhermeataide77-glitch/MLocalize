@@ -14,7 +14,7 @@ Mlocalize/
 ├── principal.py        # Script principal com os cálculos astronômicos (Astropy)
 └── README.md           # Documentação do projeto
 
-⚙️ Pré-requisitos e Instalação
+##⚙️ Pré-requisitos e Instalação
 Certifique-se de ter o Python instalado em sua máquina. Em seguida, instale a dependência necessária (astropy) abrindo o terminal na pasta do projeto e executando:
 
 Bash
