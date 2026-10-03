@@ -12,10 +12,10 @@ class MlocalizeApp:
         self.root = root
         self.root.title("Mlocalize - Objetos Messier Visíveis")
         self.root.geometry("750x600")
-        self.root.configure(bg="#121212") # Fundo escuro para astronomia
+        self.root.configure(bg="#121212") 
 
         # Título
-        titulo = tk.Label(root, text="🔭 Mlocalize - Céu de Campina Grande, PB", 
+        titulo = tk.Label(root, text="🔭 Mlocalize - Objetos Messier Visíveis", 
                           font=("Arial", 14, "bold"), fg="#ffffff", bg="#121212")
         titulo.pack(pady=15)
 
@@ -25,7 +25,7 @@ class MlocalizeApp:
                                  font=("Arial", 11, "bold"), bg="#1f6feb", fg="white", padx=10, relief="flat")
         btn_calcular.pack(pady=5)
 
-        # Caixa de texto com barra de rolagem (estilo terminal limpo)
+        # Caixa de texto com barra de rolagem 
         frame_texto = tk.Frame(root, bg="#121212")
         frame_texto.pack(fill="both", expand=True, padx=20, pady=15)
 
@@ -42,7 +42,7 @@ class MlocalizeApp:
         self.atualizar_dados()
 
     def calcular_visibilidade(self):
-        # Localização (Campina Grande, PB)
+        # Localização (INFORME AQUI SUA LATITUDE, LONGITUDE E ALTITUDE)
         localizacao = EarthLocation(lat=-7.2300 * u.deg, lon=-35.8811 * u.deg, height=550 * u.m)
         tempo = Time.now()
         frame = AltAz(obstime=tempo, location=localizacao)
@@ -68,7 +68,7 @@ class MlocalizeApp:
         largura_coluna_nome = 45
         linha_separadora = "-" * (largura_coluna_nome + 26)
 
-        # Iniciando direto com a tabela sem exibir horário ou local na tela
+       # Monta o texto de saída
         texto_saida = f"{'Objeto':<{largura_coluna_nome}} | {'Altitude':<10} | {'Azimute':<10}\n"
         texto_saida += linha_separadora + "\n"
         
@@ -80,7 +80,7 @@ class MlocalizeApp:
         
         melhores = [o for o in visiveis if o["altitude"] >= 60.0]
         texto_saida += "=" * len(linha_separadora) + "\n"
-        texto_saida += "⭐ RECOMENDAÇÃO DA NOITE (Mais próximos do Zênite / Alto Céu):\n"
+        texto_saida += "RECOMENDAÇÃO DA NOITE (Mais próximos do Zênite / Alto Céu):\n"
         texto_saida += "=" * len(linha_separadora) + "\n"
         
         if melhores:
