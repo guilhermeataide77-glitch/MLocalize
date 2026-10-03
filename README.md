@@ -1,6 +1,6 @@
 # 🌌 MLocalize
 
-Um script simples em **Python** desenvolvido para astrônomos amadores calcularem, com precisão matemática razoável, a visibilidade dos objetos do **Catálogo Messier** a partir de qualquer coordenada geográfica e horário.
+Uma aplicação simples em **Python** desenvolvida para astrônomos amadores calcularem, com precisão matemática razoável, a visibilidade dos objetos do **Catálogo Messier** a partir de qualquer coordenada geográfica e horário.
 
 ---
 
@@ -41,13 +41,14 @@ python principal.py
 NÃO ESQUEÇA DE INFORMAR SUA LATITUDE, LONGITUDE E ALTITUDE:
 
 ```bash
-latitude_usuario = -7.2300 * u.deg
-longitude_usuario = -35.8811 * u.deg
-altitude_usuario = 550 * u.m
+# Localização (INFORME AQUI SUA LATITUDE, LONGITUDE E ALTITUDE)
+        localizacao = EarthLocation(lat=-7.2300 * u.deg, lon=-35.8811 * u.deg, height=550 * u.m)
+        tempo = Time.now()
+        frame = AltAz(obstime=tempo, location=localizacao)
 ```
 
 
-O programa irá gerar no terminal:
+A interface gráfica irá exibir:
 
 * 🔭 Uma tabela formatada contendo todos os objetos visíveis (**altitude > 15°**).
 * 📐 Os objetos ordenados por proximidade ao **zênite**.
@@ -59,7 +60,7 @@ O programa irá gerar no terminal:
 
 * **Python**
 * **Astropy** — utilizada para manipulação de tempo, localização e transformações entre sistemas de coordenadas celestes **ICRS** e **AltAz**.
-
+* **Tkinter** — para a construção da interface gráfica em modo escuro otimizada para observação noturna.
 ---
 
 ## 📚 Fonte dos Dados
@@ -127,5 +128,5 @@ O projeto também pode servir como base para futuras funcionalidades, como:
 * 🧭 cálculo de coordenadas para apontamento de telescópios;
 * 📡 integração com montagens motorizadas;
 * ⭐ filtros por tipo de objeto;
-* 📱 interface gráfica ou aplicação web;
+* 📱 interface gráfica melhor ou aplicação web;
 * 🔭 integração com softwares de astronomia.
