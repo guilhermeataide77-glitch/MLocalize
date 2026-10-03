@@ -1,5 +1,7 @@
 # 🌌 MLocalize
 
+[![Powered by Astropy Logo](https://img.shields.io/badge/powered%20by-Astropy-orange.svg?style=flat)](https://www.astropy.org/)
+
 Uma aplicação simples em **Python** desenvolvida para astrônomos amadores calcularem, com precisão matemática razoável, a visibilidade dos objetos do **Catálogo Messier** a partir de qualquer coordenada geográfica e horário.
 
 ---
