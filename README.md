@@ -62,6 +62,17 @@ O programa irá gerar no terminal:
 
 ---
 
+## 📚 Fonte dos Dados
+
+As coordenadas de **Ascensão Reta (AR)** e **Declinação (Dec)** dos objetos do Catálogo Messier utilizadas neste projeto foram obtidas a partir dos dados disponibilizados pelo **SEDS (Students for the Exploration and Development of Space)**:
+
+**Messier Objects — SEDS**
+http://www.messier.seds.org/data.html
+
+Os dados foram utilizados como referência para o arquivo `dados/catalogo.py`.
+
+---
+
 ## 🔭 Funcionamento
 
 O MLocalize utiliza as coordenadas de **Ascensão Reta (AR)** e **Declinação (Dec)** dos objetos do Catálogo Messier para determinar sua posição aparente no céu.
